@@ -1,5 +1,6 @@
 package `in`.bitcode.recyclerview3
 
+import android.content.Intent
 import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,12 @@ class PostsAdapter(
     private val posts : ArrayList<Post>,
     private val advertisements: ArrayList<Advertisement>
 ) : RecyclerView.Adapter<ViewHolder>(){
+
+    interface OnPostClickListener {
+        fun onPostClick(position : Int, post : Post)
+    }
+    var onPostClickListener : OnPostClickListener? = null
+
 
     val VIEW_TYPE_POST = 1
     val VIEW_TYPE_ADV = 2
@@ -38,8 +45,28 @@ class PostsAdapter(
             txtUsername = view.findViewById(R.id.txtUsername)
             txtPostTitle = view.findViewById(R.id.txtPostTitle)
             imgPost = view.findViewById(R.id.imgPost)
+
+            itemView.setOnClickListener {
+
+                if(onPostClickListener != null) {
+                    onPostClickListener!!.onPostClick(
+                        adapterPosition - adapterPosition / 3,
+                        posts[adapterPosition - adapterPosition / 3]
+                    )
+                }
+
+                //fixed actions are not good
+                /*val intent = Intent(it.context, PostDetailsActivity::class.java)
+                intent.putExtra("post", posts[adapterPosition - adapterPosition / 3])
+                it.context.startActivity(intent)*/
+            }
         }
     }
+
+    interface OnAdvClickListener {
+        fun onAdvClick(position: Int, advertisement: Advertisement)
+    }
+    var onAdvClickListener : OnAdvClickListener? = null
 
     inner class AdvViewHolder(
         val view : View
@@ -47,6 +74,18 @@ class PostsAdapter(
         val txtAdv : TextView
         init {
             txtAdv = view.findViewById(R.id.txtAdv)
+
+            txtAdv.setOnClickListener {
+                onAdvClickListener?.onAdvClick(
+                    adapterPosition/2 -1,
+                    advertisements[adapterPosition/2 -1]
+                )
+
+                //fixed actions are not good
+                /*val intent = Intent(it.context, AdvertisementActivity::class.java)
+                intent.putExtra("adv", advertisements[adapterPosition/2 - 1])
+                it.context.startActivity(intent)*/
+            }
         }
     }
 

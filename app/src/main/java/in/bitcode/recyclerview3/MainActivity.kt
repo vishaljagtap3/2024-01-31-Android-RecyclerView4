@@ -1,9 +1,12 @@
 package `in`.bitcode.recyclerview3
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.util.Random
 
 class MainActivity : AppCompatActivity() {
 
@@ -19,6 +22,33 @@ class MainActivity : AppCompatActivity() {
         initViews()
         initData()
         initAdapter()
+    }
+
+    private inner class MyOnPostClickListener : PostsAdapter.OnPostClickListener {
+        override fun onPostClick(position: Int, post: Post) {
+
+            if(isLoggedIn()) {
+                val intent = Intent(this@MainActivity, PostDetailsActivity::class.java)
+                intent.putExtra("post", post)
+                startActivity(intent)
+                Toast.makeText(this@MainActivity, "Post: ${post.title}", Toast.LENGTH_LONG).show()
+            }
+            else {
+                startActivity(
+                    Intent(this@MainActivity, LoginActivity::class.java)
+                )
+            }
+        }
+    }
+
+    private fun isLoggedIn() : Boolean{
+        return Random().nextBoolean()
+    }
+
+    private inner class MyOnAdvClickListener : PostsAdapter.OnAdvClickListener {
+        override fun onAdvClick(position: Int, advertisement: Advertisement) {
+            Toast.makeText(this@MainActivity, "Adv: ${advertisement.title}", Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun initData() {
@@ -45,6 +75,9 @@ class MainActivity : AppCompatActivity() {
     private fun initAdapter() {
         postsAdapter = PostsAdapter(posts, advertisements)
         recyclerPosts.adapter = postsAdapter
+
+        postsAdapter.onPostClickListener = MyOnPostClickListener()
+        postsAdapter.onAdvClickListener = MyOnAdvClickListener()
     }
 
     private fun initViews() {
